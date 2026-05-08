@@ -8,6 +8,8 @@ export const BUILT_IN_PROVIDER_DISPLAY_NAMES: Record<string, string> = {
 	deepseek: "DeepSeek",
 	fireworks: "Fireworks",
 	google: "Google Gemini",
+	"google-gemini-cli": "Google Gemini CLI",
+	"google-antigravity": "Antigravity",
 	"google-vertex": "Google Vertex AI",
 	groq: "Groq",
 	huggingface: "Hugging Face",

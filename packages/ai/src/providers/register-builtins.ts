@@ -14,6 +14,7 @@ import type { BedrockOptions } from "./amazon-bedrock.js";
 import type { AnthropicOptions } from "./anthropic.js";
 import type { AzureOpenAIResponsesOptions } from "./azure-openai-responses.js";
 import type { GoogleOptions } from "./google.js";
+import type { GoogleGeminiCliOptions } from "./google-gemini-cli.js";
 import type { GoogleVertexOptions } from "./google-vertex.js";
 import type { MistralOptions } from "./mistral.js";
 import type { OpenAICodexResponsesOptions } from "./openai-codex-responses.js";
@@ -51,6 +52,11 @@ interface GoogleProviderModule {
 interface GoogleVertexProviderModule {
 	streamGoogleVertex: StreamFunction<"google-vertex", GoogleVertexOptions>;
 	streamSimpleGoogleVertex: StreamFunction<"google-vertex", SimpleStreamOptions>;
+}
+
+interface GoogleGeminiCliProviderModule {
+	streamGoogleGeminiCli: StreamFunction<"google-gemini-cli", GoogleGeminiCliOptions>;
+	streamSimpleGoogleGeminiCli: StreamFunction<"google-gemini-cli", SimpleStreamOptions>;
 }
 
 interface MistralProviderModule {
@@ -99,6 +105,9 @@ let googleProviderModulePromise:
 	| undefined;
 let googleVertexProviderModulePromise:
 	| Promise<LazyProviderModule<"google-vertex", GoogleVertexOptions, SimpleStreamOptions>>
+	| undefined;
+let googleGeminiCliProviderModulePromise:
+	| Promise<LazyProviderModule<"google-gemini-cli", GoogleGeminiCliOptions, SimpleStreamOptions>>
 	| undefined;
 let mistralProviderModulePromise:
 	| Promise<LazyProviderModule<"mistral-conversations", MistralOptions, SimpleStreamOptions>>
@@ -252,6 +261,19 @@ function loadGoogleVertexProviderModule(): Promise<
 	return googleVertexProviderModulePromise;
 }
 
+function loadGoogleGeminiCliProviderModule(): Promise<
+	LazyProviderModule<"google-gemini-cli", GoogleGeminiCliOptions, SimpleStreamOptions>
+> {
+	googleGeminiCliProviderModulePromise ||= import("./google-gemini-cli.js").then((module) => {
+		const provider = module as GoogleGeminiCliProviderModule;
+		return {
+			stream: provider.streamGoogleGeminiCli,
+			streamSimple: provider.streamSimpleGoogleGeminiCli,
+		};
+	});
+	return googleGeminiCliProviderModulePromise;
+}
+
 function loadMistralProviderModule(): Promise<
 	LazyProviderModule<"mistral-conversations", MistralOptions, SimpleStreamOptions>
 > {
@@ -328,6 +350,8 @@ export const streamGoogle = createLazyStream(loadGoogleProviderModule);
 export const streamSimpleGoogle = createLazySimpleStream(loadGoogleProviderModule);
 export const streamGoogleVertex = createLazyStream(loadGoogleVertexProviderModule);
 export const streamSimpleGoogleVertex = createLazySimpleStream(loadGoogleVertexProviderModule);
+export const streamGoogleGeminiCli = createLazyStream(loadGoogleGeminiCliProviderModule);
+export const streamSimpleGoogleGeminiCli = createLazySimpleStream(loadGoogleGeminiCliProviderModule);
 export const streamMistral = createLazyStream(loadMistralProviderModule);
 export const streamSimpleMistral = createLazySimpleStream(loadMistralProviderModule);
 export const streamOpenAICodexResponses = createLazyStream(loadOpenAICodexResponsesProviderModule);
@@ -386,6 +410,18 @@ export function registerBuiltInApiProviders(): void {
 		api: "google-vertex",
 		stream: streamGoogleVertex,
 		streamSimple: streamSimpleGoogleVertex,
+	});
+
+	registerApiProvider({
+		api: "google-gemini-cli",
+		stream: streamGoogleGeminiCli,
+		streamSimple: streamSimpleGoogleGeminiCli,
+	});
+
+	registerApiProvider({
+		api: "google-antigravity",
+		stream: streamGoogleGeminiCli as any,
+		streamSimple: streamSimpleGoogleGeminiCli as any,
 	});
 
 	registerApiProvider({
