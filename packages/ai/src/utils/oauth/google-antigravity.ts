@@ -166,7 +166,7 @@ async function discoverProject(accessToken: string, onProgress?: (message: strin
 	};
 
 	// Try endpoints in order: prod first, then sandbox
-	const endpoints = ["https://cloudcode-pa.googleapis.com", "https://daily-cloudcode-pa.sandbox.googleapis.com"];
+	const endpoints = ["https://daily-cloudcode-pa.sandbox.googleapis.com", "https://cloudcode-pa.googleapis.com"];
 
 	onProgress?.("Checking for existing project...");
 
